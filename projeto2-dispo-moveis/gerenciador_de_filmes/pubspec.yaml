@@ -15,6 +15,7 @@ dependencies:
   path: ^1.8.3
   cupertino_icons: ^1.0.8
   flutter_rating_bar: ^4.0.1
+  smooth_star_rating_null_safety: ^1.0.4+2
 
 dev_dependencies:
   flutter_test:

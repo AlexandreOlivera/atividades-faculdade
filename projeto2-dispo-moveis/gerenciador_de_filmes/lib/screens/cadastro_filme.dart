@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import '../database/db_helper.dart';
-import '../models/filme.dart';
+import 'package:smooth_star_rating_null_safety/smooth_star_rating_null_safety.dart';
 
 class CadastroFilme extends StatefulWidget {
   @override
@@ -9,136 +8,127 @@ class CadastroFilme extends StatefulWidget {
 
 class _CadastroFilmeState extends State<CadastroFilme> {
   final _formKey = GlobalKey<FormState>();
-  final _urlImagemController = TextEditingController();
-  final _tituloController = TextEditingController();
-  final _generoController = TextEditingController();
-  final _faixaEtariaController = TextEditingController();
-  final _duracaoController = TextEditingController();
-  final _pontuacaoController = TextEditingController();
-  final _descricaoController = TextEditingController();
-  final _anoController = TextEditingController();
 
-  void _salvarFilme() async {
+  TextEditingController _tituloController = TextEditingController();
+  TextEditingController _descricaoController = TextEditingController();
+
+  String? _faixaEtaria;
+  double _pontuacao = 0;
+
+  
+  final List<String> _faixasEtarias = ['Livre', '10', '12', '14', '16', '18'];
+
+  
+  void _salvarFilme() {
     if (_formKey.currentState!.validate()) {
-      final novoFilme = Filme(
-        urlImagem: _urlImagemController.text,
-        titulo: _tituloController.text,
-        genero: _generoController.text,
-        faixaEtaria: _faixaEtariaController.text,
-        duracao: int.parse(_duracaoController.text),
-        pontuacao: double.parse(_pontuacaoController.text),
-        descricao: _descricaoController.text,
-        ano: int.parse(_anoController.text),
-      );
-
-      await DBHelper().inserirFilme(novoFilme);
-
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Filme cadastrado com sucesso!')),
       );
 
-      Navigator.pop(context); // Voltar para a tela anterior
+      
+      _tituloController.clear();
+      _descricaoController.clear();
+      setState(() {
+        _faixaEtaria = null;
+        _pontuacao = 0;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Cadastrar Filme')),
+      appBar: AppBar(
+        title: Text('Cadastrar Filme'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: ListView(
-            children: [
-              TextFormField(
-                controller: _urlImagemController,
-                decoration: InputDecoration(labelText: 'URL da Imagem'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Informe uma URL válida.';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _tituloController,
-                decoration: InputDecoration(labelText: 'Título'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'O título é obrigatório.';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _generoController,
-                decoration: InputDecoration(labelText: 'Gênero'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'O gênero é obrigatório.';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _faixaEtariaController,
-                decoration: InputDecoration(labelText: 'Faixa Etária'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'A faixa etária é obrigatória.';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _duracaoController,
-                decoration: InputDecoration(labelText: 'Duração (em minutos)'),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty || int.tryParse(value) == null) {
-                    return 'Informe uma duração válida.';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _pontuacaoController,
-                decoration: InputDecoration(labelText: 'Pontuação (0-10)'),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty || double.tryParse(value) == null) {
-                    return 'Informe uma pontuação válida.';
-                  }
-                  final pontuacao = double.parse(value);
-                  if (pontuacao < 0 || pontuacao > 10) {
-                    return 'A pontuação deve estar entre 0 e 10.';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _descricaoController,
-                decoration: InputDecoration(labelText: 'Descrição'),
-                maxLines: 3,
-              ),
-              TextFormField(
-                controller: _anoController,
-                decoration: InputDecoration(labelText: 'Ano'),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty || int.tryParse(value) == null) {
-                    return 'Informe um ano válido.';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _salvarFilme,
-                child: Text('Salvar'),
-              ),
-            ],
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                
+                TextFormField(
+                  controller: _tituloController,
+                  decoration: InputDecoration(labelText: 'Título do Filme'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'O título é obrigatório';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 16),
+
+                DropdownButtonFormField<String>(
+                  value: _faixaEtaria,
+                  decoration: InputDecoration(labelText: 'Faixa Etária'),
+                  items: _faixasEtarias.map((faixa) {
+                    return DropdownMenuItem<String>(
+                      value: faixa,
+                      child: Text(faixa),
+                    );
+                  }).toList(),
+                  onChanged: (valorSelecionado) {
+                    setState(() {
+                      _faixaEtaria = valorSelecionado;
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null) {
+                      return 'Selecione uma faixa etária';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 16),
+
+                
+                TextFormField(
+                  controller: _descricaoController,
+                  decoration: InputDecoration(labelText: 'Descrição'),
+                  maxLines: 4,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'A descrição é obrigatória';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 16),
+
+                
+                Text('Pontuação do Filme:'),
+                SmoothStarRating(
+                  allowHalfRating: true,
+                  onRatingChanged: (valor) {
+                    setState(() {
+                      _pontuacao = valor;
+                    });
+                  },
+                  starCount: 5,
+                  rating: _pontuacao,
+                  size: 40.0,
+                  filledIconData: Icons.star,
+                  halfFilledIconData: Icons.star_half,
+                  defaultIconData: Icons.star_border,
+                  color: Colors.amber,
+                  borderColor: Colors.amber,
+                  spacing: 2.0,
+                ),
+                SizedBox(height: 16),
+
+                Center(
+                  child: ElevatedButton(
+                    onPressed: _salvarFilme,
+                    child: Text('Salvar Filme'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

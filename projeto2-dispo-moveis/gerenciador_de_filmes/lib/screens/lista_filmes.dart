@@ -7,7 +7,7 @@ class ListaFilmes extends StatefulWidget {
 }
 
 class _ListaFilmesState extends State<ListaFilmes> {
-  // Lista de filmes (exemplo)
+  
   List<Map<String, dynamic>> filmes = [
     {
       'id': 1,
@@ -25,14 +25,13 @@ class _ListaFilmesState extends State<ListaFilmes> {
     },
   ];
 
-  // Função para recarregar filmes (simulação)
+  
   void _carregarFilmes() {
     setState(() {
-      // Aqui você pode buscar do banco de dados ou atualizar a lista
+      
     });
   }
 
-  // Função para deletar um filme
   void deletarFilme(int id) {
     setState(() {
       filmes.removeWhere((filme) => filme['id'] == id);
